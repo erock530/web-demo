@@ -37,7 +37,7 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 WORKDIR /
 
 COPY --from=build-stage /web-demo /web-demo
-ADD --from=build-stage /content/index.html /content/index.html
+ADD content/index.html /content/index.html
 
 EXPOSE 8000
 
