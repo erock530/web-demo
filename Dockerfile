@@ -1,9 +1,45 @@
-FROM golang
+# syntax=docker/dockerfile:1
 
-ADD . /go/src/github.com/erock530/web-demo
+##
+## Build the application from source
+##
 
-RUN go install github.com/erock530/web-demo
+FROM golang:1.20 AS build-stage
 
-ADD ./content /content
+WORKDIR /app
 
-ENTRYPOINT /go/bin/web-demo
+##
+## Copy files
+##
+COPY go.mod ./
+RUN go mod download
+RUN mkdir content/
+COPY content/* ./content/
+COPY *.go ./
+
+##
+## Build the executable
+##
+RUN CGO_ENABLED=0 GOOS=linux go build -o /web-demo ./main.go
+
+##
+## Run the tests in the container
+##
+
+FROM build-stage AS run-test-stage
+RUN go test -v ./...
+
+##
+## Deploy the application binary into a lean image
+##
+FROM gcr.io/distroless/base-debian11 AS build-release-stage
+
+WORKDIR /
+
+COPY --from=build-stage /web-demo /web-demo
+
+EXPOSE 8000
+
+USER nonroot:nonroot
+
+ENTRYPOINT ["/web-demo"]
