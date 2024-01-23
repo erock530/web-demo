@@ -36,6 +36,7 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 
 WORKDIR /
 
+RUN mkdir content/
 COPY --from=build-stage /web-demo /web-demo
 COPY --from=build-stage /content/index.html /content/index.html
 
