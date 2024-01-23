@@ -14,7 +14,7 @@ WORKDIR /app
 COPY go.mod ./
 RUN go mod download
 RUN mkdir content/
-COPY content/* ./content/
+COPY content/index.html ./content/
 COPY *.go ./
 
 ##
@@ -37,7 +37,7 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 WORKDIR /
 
 COPY --from=build-stage /web-demo /web-demo
-COPY --from=build-stage /content/* /content/
+COPY --from=build-stage content/index.html /content/
 
 EXPOSE 8000
 
